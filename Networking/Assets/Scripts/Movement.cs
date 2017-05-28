@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class Movement : MonoBehaviour {
     public float speed = 5.0f;
-    //public Text debug;
 
     private Vector3 destination;
     private bool flag;
