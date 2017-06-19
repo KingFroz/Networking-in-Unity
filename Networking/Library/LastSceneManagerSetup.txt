@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/TemplateScene.unity
+- path: Assets/Scenes/TileMapGeneration.unity
   isLoaded: 1
   isActive: 1

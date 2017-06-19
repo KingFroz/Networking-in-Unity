@@ -7,7 +7,6 @@ public class Movement : MonoBehaviour {
     private bool flag;
 
     private Camera viewCamera;
-    private Vector3 velocity;
     void Start()
     {
         viewCamera = Camera.main;
