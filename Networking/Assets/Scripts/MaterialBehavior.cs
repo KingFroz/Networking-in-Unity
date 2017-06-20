@@ -9,8 +9,32 @@ public class MaterialBehavior : Chemistry {
     [SerializeField]
     private MaterialType m_Type;
 
-    public override void EvaluateChange()
+    public override void ChemicalReaction(State _state)
     {
-        throw new NotImplementedException();
+        switch (m_Type)
+        {
+            case MaterialType.Earth:
+                break;
+            case MaterialType.Wood:
+                if (_state ==  State.Burning)
+                {
+                    Debug.Log("Wood Object set on Fire");
+                }
+                
+                break;
+            case MaterialType.Metal:
+                break;
+            case MaterialType.Water:
+                break;
+            default:
+                break;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Chemistry temp = other.gameObject.GetComponent<Chemistry>();
+        if (temp != null)
+            ChemicalReaction(temp.GetState());
     }
 }

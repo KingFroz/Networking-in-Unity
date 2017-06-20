@@ -4,11 +4,11 @@ using UnityEngine;
 
 public abstract class Chemistry : MonoBehaviour {
     //State of Object
-    public enum State { Default, Frozen, OnFire, Shocked, Destroy };
+    public enum State { None, Frozen, Burning, Shocked };
     private State m_MyState;
 
     public State GetState() { return m_MyState; }
-    public void SetState(State _state) { m_MyState = _state; }
+    public void ChangeState(State _state) { m_MyState = _state; }
 
-    public abstract void EvaluateChange();
+    public abstract void ChemicalReaction(State _state);
 }

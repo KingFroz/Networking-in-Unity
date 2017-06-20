@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class TileMapGenerator : MonoBehaviour {
     public Transform tilePrefab;
-    public Transform obstaclePrefab;
+    public Transform[] obstacleArray;
     public Vector2 mapSize;
 
     [Range(0, 1)]
@@ -200,7 +200,7 @@ public class TileMapGenerator : MonoBehaviour {
 
             if (randCoord != mapCentre && MapIsFullyAccessible(obstacleMap, currObstCount)) {
                 Vector3 obstaclePosition = CoordToPosition(randCoord.x, randCoord.y);
-                Transform obstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * 0.5f, Quaternion.identity) as Transform;
+                Transform obstacle = Instantiate(obstacleArray[Random.Range(0, obstacleArray.Length)], obstaclePosition + Vector3.up * 0.5f, Quaternion.identity) as Transform;
                 obstacle.parent = mapHolder;
             }
             else {
