@@ -10,6 +10,8 @@ public class TileMapGenerator : MonoBehaviour {
     [Range(0, 1)]
     public float outlinePercent;
 
+    public float tileSize;
+
     private float Offset;
 
     //Collection of Tile Coords
@@ -153,7 +155,7 @@ public class TileMapGenerator : MonoBehaviour {
     }
 
     private Vector3 CoordToPosition(int x, int y) {
-        return new Vector3 (-mapSize.x / 2 + Offset + x, 0, -mapSize.y / 2 + Offset + y);
+        return new Vector3 (-mapSize.x / 2 + Offset + x, 0, -mapSize.y / 2 + Offset + y) * tileSize;
     }
 
     //Creates Tile Map
@@ -183,7 +185,7 @@ public class TileMapGenerator : MonoBehaviour {
             for (int y = 0; y < mapSize.y; y++) {
                 Vector3 tilePosition = CoordToPosition(x, y);
                 Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
-                tileinstance.localScale = Vector3.one * (1 - outlinePercent);
+                tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
                 tileinstance.parent = mapHolder;
             }
         }
@@ -201,6 +203,7 @@ public class TileMapGenerator : MonoBehaviour {
             if (randCoord != mapCentre && MapIsFullyAccessible(obstacleMap, currObstCount)) {
                 Vector3 obstaclePosition = CoordToPosition(randCoord.x, randCoord.y);
                 Transform obstacle = Instantiate(obstacleArray[Random.Range(0, obstacleArray.Length)], obstaclePosition + Vector3.up * 0.5f, Quaternion.identity) as Transform;
+                obstacle.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
                 obstacle.parent = mapHolder;
             }
             else {

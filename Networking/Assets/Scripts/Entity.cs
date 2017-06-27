@@ -16,9 +16,10 @@ public abstract class Entity : MonoBehaviour, IMoveable, ISwipeable
 
     public void Swipe()
     {
-#if UNITY_EDITOR
         Vector3 startPos, endPos, currentSwipe;
         startPos = endPos = currentSwipe = Vector3.zero;
+
+#if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
         {
             //save began touch 2d point

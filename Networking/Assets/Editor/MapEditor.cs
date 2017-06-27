@@ -8,7 +8,7 @@ public class MapEditor : Editor {
     {
         base.OnInspectorGUI();
 
-        //TileMapGenerator map = target as TileMapGenerator;
-        //map.GenerateMap();
+        TileMapGenerator map = target as TileMapGenerator;
+        map.GenerateMap();
     }
 }

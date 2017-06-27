@@ -7,9 +7,13 @@ public class Player : Entity {
 
     private Camera viewCamera;
 
+    public enum State { Moving, Firing }
+    private State _state;
+
     public override void InitMovement()
     {
         speed = 2.0f;
+        _state = State.Moving;
     }
 
     // Use this for initialization
@@ -19,9 +23,26 @@ public class Player : Entity {
     }
 
     void FixedUpdate () {
-        Move();
+        DFSM();
 	}
 
+    private void DFSM()
+    {
+        //If Double Tap: Change State
+        if (Input.touchCount > 0)
+        {
+
+        }
+
+        switch (_state)
+        {
+            case State.Moving:
+                Move();
+                break;
+            case State.Firing:
+                break;
+        }
+    }
     public override void TakeActionU()
     {
         throw new NotImplementedException();
