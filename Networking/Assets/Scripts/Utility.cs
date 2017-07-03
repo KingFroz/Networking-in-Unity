@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿
 
 public static class Utility {
     //Fisher Yates Shuffle | Seed allows shuffling of array in the same order

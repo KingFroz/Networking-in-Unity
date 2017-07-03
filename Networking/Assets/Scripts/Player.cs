@@ -5,44 +5,49 @@ public class Player : Entity {
     private Vector3 destination;
     private bool flag;
 
+    private Rigidbody rigidBody;
+    
     private Camera viewCamera;
 
-    public enum State { Moving, Firing }
-    private State _state;
+    WeaponController weaponControl;
 
-    public override void InitMovement()
-    {
-        speed = 2.0f;
-        _state = State.Moving;
+    public override void InitMovement() {
+        speed = 50f;
     }
 
     // Use this for initialization
     void Start () {
+        rigidBody = GetComponent<Rigidbody>();
         InitMovement();
         viewCamera = Camera.main;
+        weaponControl = GetComponent<WeaponController>();
     }
 
-    void FixedUpdate () {
-        DFSM();
-	}
-
-    private void DFSM()
+    void Update()
     {
-        //If Double Tap: Change State
+        ShootToMove();
+    }
+
+    private void ShootToMove()
+    {
         if (Input.touchCount > 0)
-        {
+            Controller();
+    }
 
-        }
+    private void Controller()
+    {
+        Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
-        switch (_state)
-        {
-            case State.Moving:
-                Move();
-                break;
-            case State.Firing:
-                break;
+        float rayDistance;
+        if (groundPlane.Raycast(ray, out rayDistance)) {
+            Vector3 point = ray.GetPoint(rayDistance);
+            Vector3 sendPoint = new Vector3(point.x, transform.position.y, point.z);
+            transform.LookAt(sendPoint);
+            weaponControl.Shoot(rigidBody, new Vector3(-transform.forward.x, 0, -transform.forward.z), speed);
         }
     }
+
     public override void TakeActionU()
     {
         throw new NotImplementedException();

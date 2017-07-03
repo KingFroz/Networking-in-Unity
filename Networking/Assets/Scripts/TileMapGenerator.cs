@@ -1,30 +1,26 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.AI;
 using System.Collections.Generic;
 
 public class TileMapGenerator : MonoBehaviour {
     public Transform tilePrefab;
-    public Transform[] obstacleArray;
-    public Vector2 mapSize;
+    public Transform obstaclePrefab;
 
     [Range(0, 1)]
     public float outlinePercent;
 
     public float tileSize;
 
-    private float Offset;
-
     //Collection of Tile Coords
     List<Coords> m_Collection;
     Queue<Coords> m_ShuffledCollection;
 
-    public int seed = 5;
+    public Map[] maps;
+    public int mapIndex;
 
-    [Range(0, 1)]
-    public float percentage;
+    Map m_CurrentMap;
 
-    Coords mapCentre;
-
+    [System.Serializable]
     public class Coords
     {
         public int x;
@@ -89,12 +85,24 @@ public class TileMapGenerator : MonoBehaviour {
         }
     }
 
-    void Start()
+    [System.Serializable]
+    public class Map
     {
-        Offset = 0.5f;
+        public int m_Seed;
+        [Range(0, 1)]
+        public float m_ObstaclePercent;
+        public float minObstacleHeight, maxObstacleHeight;
+        public Coords mapSize;
+        public Coords mapCentre
+        {
+            get { return new Coords((int)(mapSize.x * 0.5f), (int)(mapSize.y * 0.5f)); }
+        }
+    }
+
+    void Start() {
         GenerateMap();
     }
-    
+
     public Coords GetRandCoord()
     {
         Coords randCoord = m_ShuffledCollection.Dequeue();
@@ -113,8 +121,8 @@ public class TileMapGenerator : MonoBehaviour {
     bool MapIsFullyAccessible(bool[,] obstacleMap, int currentObstacleCount) {
         bool[,] visitedList = new bool[obstacleMap.GetLength(0), obstacleMap.GetLength(1)];
         Queue<Coords> queue = new Queue<Coords>();
-        queue.Enqueue(mapCentre);
-        visitedList[mapCentre.x, mapCentre.y] = true;
+        queue.Enqueue(m_CurrentMap.mapCentre);
+        visitedList[m_CurrentMap.mapCentre.x, m_CurrentMap.mapCentre.y] = true;
 
         //Centre Tile + 1
         int accessibleTileCount = 1;
@@ -147,7 +155,7 @@ public class TileMapGenerator : MonoBehaviour {
         }
 
         //Number of Tiles that should exist - Obstacles amount
-        int targetAccessibleTileCount = (int)(mapSize.x * mapSize.y) - currentObstacleCount;
+        int targetAccessibleTileCount = (int)(m_CurrentMap.mapSize.x * m_CurrentMap.mapSize.y) - currentObstacleCount;
 
         //If true, Map is fully accessible
         //Else, inaccessible
@@ -155,60 +163,75 @@ public class TileMapGenerator : MonoBehaviour {
     }
 
     private Vector3 CoordToPosition(int x, int y) {
-        return new Vector3 (-mapSize.x / 2 + Offset + x, 0, -mapSize.y / 2 + Offset + y) * tileSize;
+        return new Vector3 (-m_CurrentMap.mapSize.x / 2 + x, 0, -m_CurrentMap.mapSize.y / 2 + y) * tileSize;
     }
 
     //Creates Tile Map
     public void GenerateMap()
     {
+        m_CurrentMap = maps[mapIndex];
+        System.Random prng = new System.Random(m_CurrentMap.m_Seed);
         m_Collection = new List<Coords>();
 
-        for (int x = 0; x < mapSize.x; x++) {
-            for (int y = 0; y < mapSize.y; y++) {
+        //Generating Coords
+        for (int x = 0; x < m_CurrentMap.mapSize.x; x++) {
+            for (int y = 0; y < m_CurrentMap.mapSize.y; y++) {
                 m_Collection.Add(new Coords(x, y));
             }
         }
 
-        m_ShuffledCollection = new Queue<Coords>(Utility.ShuffleArray(m_Collection.ToArray(), seed));
-        mapCentre = new Coords((int)(mapSize.x * 0.5f), (int)(mapSize.y * 0.5f));
+        //Shuffle Collection of Coords
+        m_ShuffledCollection = new Queue<Coords>(Utility.ShuffleArray(m_Collection.ToArray(), m_CurrentMap.m_Seed));
 
+#if UNITY_EDITOR
+        //Clear list on function call
         string name = "Generated Map";
-        if (transform.FindChild(name)) {
-            DestroyImmediate(transform.FindChild(name).gameObject);
+        if (transform.Find(name)) {
+            DestroyImmediate(transform.Find(name).gameObject);
         }
 
         Transform mapHolder = new GameObject(name).transform;
         mapHolder.parent = transform;
+#endif
 
-        //Position tiles by dividing -Map X and -Map Y by 2 + Offset
-        for (int x = 0; x < mapSize.x; x++) {
-            for (int y = 0; y < mapSize.y; y++) {
-                Vector3 tilePosition = CoordToPosition(x, y);
-                Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
-                tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
-                tileinstance.parent = mapHolder;
-            }
-        }
-
-        bool[,] obstacleMap = new bool[(int)mapSize.x, (int)mapSize.y];
-
+        bool[,] obstacleMap = new bool[m_CurrentMap.mapSize.x, m_CurrentMap.mapSize.y];
+        //Set Obstacle positions
         int currObstCount = 0;
-        int numObstacles = (int)((mapSize.x * mapSize.y) * percentage);
+        int numObstacles = (int)((m_CurrentMap.mapSize.x * m_CurrentMap.mapSize.y) * m_CurrentMap.m_ObstaclePercent);
         for (int i = 0; i < numObstacles; i++)
         {
             Coords randCoord = GetRandCoord();
             obstacleMap[randCoord.x, randCoord.y] = true;
             currObstCount++;
 
-            if (randCoord != mapCentre && MapIsFullyAccessible(obstacleMap, currObstCount)) {
+            if (randCoord != m_CurrentMap.mapCentre && MapIsFullyAccessible(obstacleMap, currObstCount)) {
+                float obstacleHeight = Mathf.Lerp(m_CurrentMap.minObstacleHeight, m_CurrentMap.maxObstacleHeight, (float)prng.NextDouble());
                 Vector3 obstaclePosition = CoordToPosition(randCoord.x, randCoord.y);
-                Transform obstacle = Instantiate(obstacleArray[Random.Range(0, obstacleArray.Length)], obstaclePosition + Vector3.up * 0.5f, Quaternion.identity) as Transform;
-                obstacle.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
+
+                Transform obstacle = Instantiate(obstaclePrefab, obstaclePosition + Vector3.up * (obstacleHeight * 0.5f), Quaternion.identity) as Transform;
+                obstacle.localScale = new Vector3((1 - outlinePercent) * tileSize, obstacleHeight, (1 - outlinePercent) * tileSize);
                 obstacle.parent = mapHolder;
+
             }
             else {
                 obstacleMap[randCoord.x, randCoord.y] = false;
                 currObstCount--;
+            }
+        }
+
+        //Spawn Tiles
+        for (int x = 0; x < m_CurrentMap.mapSize.x; x++)
+        {
+            for (int y = 0; y < m_CurrentMap.mapSize.y; y++)
+            {
+                Vector3 tilePosition = CoordToPosition(x, y);
+                //Only Spawn Tile if obstacle doesn't exist in current position
+                if (obstacleMap[x, y] == true)
+                    continue;
+
+                Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
+                tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
+                tileinstance.parent = mapHolder;
             }
         }
     }

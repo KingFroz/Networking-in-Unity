@@ -6,9 +6,18 @@ public class MapEditor : Editor {
 
     public override void OnInspectorGUI ()
     {
-        base.OnInspectorGUI();
-
         TileMapGenerator map = target as TileMapGenerator;
-        map.GenerateMap();
+
+        //Returns a bool
+        //True if a value has been updated in Inspector
+        //False otherwise
+        if (DrawDefaultInspector()) {
+            map.GenerateMap();
+        }
+
+        //GUI Button
+        if (GUILayout.Button("Generate Map")) {
+            map.GenerateMap();
+        }
     }
 }

@@ -7,7 +7,6 @@ public abstract class Entity : MonoBehaviour, IMoveable, ISwipeable
     public float speed { get; set;}
     public virtual void InitMovement() { speed = 2.0f; }
     public abstract void Move();
-
     //Swipe Commands
     public abstract void TakeActionL();
     public abstract void TakeActionR();
