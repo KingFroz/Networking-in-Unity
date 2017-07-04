@@ -14,11 +14,14 @@ public class TileMapGenerator : MonoBehaviour {
     //Collection of Tile Coords
     List<Coords> m_Collection;
     Queue<Coords> m_ShuffledCollection;
+    Queue<Coords> m_ShuffledOpenCollection;
 
     public Map[] maps;
     public int mapIndex;
 
     Map m_CurrentMap;
+
+    Transform[,] tileMap;
 
     [System.Serializable]
     public class Coords
@@ -110,6 +113,13 @@ public class TileMapGenerator : MonoBehaviour {
         return randCoord;
     }
 
+    public Transform GetRandomOpenTile()
+    {
+        Coords randCoord = m_ShuffledOpenCollection.Dequeue();
+        m_ShuffledOpenCollection.Enqueue(randCoord);
+        return tileMap[randCoord.x, randCoord.y];
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     // Algorithm: Flood Fill Algorithm
     // Desc: Starting at centre of Obstacle Map
@@ -170,6 +180,7 @@ public class TileMapGenerator : MonoBehaviour {
     public void GenerateMap()
     {
         m_CurrentMap = maps[mapIndex];
+        tileMap = new Transform[m_CurrentMap.mapSize.x, m_CurrentMap.mapSize.y];
         System.Random prng = new System.Random(m_CurrentMap.m_Seed);
         m_Collection = new List<Coords>();
 
@@ -183,7 +194,6 @@ public class TileMapGenerator : MonoBehaviour {
         //Shuffle Collection of Coords
         m_ShuffledCollection = new Queue<Coords>(Utility.ShuffleArray(m_Collection.ToArray(), m_CurrentMap.m_Seed));
 
-#if UNITY_EDITOR
         //Clear list on function call
         string name = "Generated Map";
         if (transform.Find(name)) {
@@ -192,9 +202,10 @@ public class TileMapGenerator : MonoBehaviour {
 
         Transform mapHolder = new GameObject(name).transform;
         mapHolder.parent = transform;
-#endif
 
         bool[,] obstacleMap = new bool[m_CurrentMap.mapSize.x, m_CurrentMap.mapSize.y];
+        List<Coords> openCollection = new List<Coords>(m_Collection);
+
         //Set Obstacle positions
         int currObstCount = 0;
         int numObstacles = (int)((m_CurrentMap.mapSize.x * m_CurrentMap.mapSize.y) * m_CurrentMap.m_ObstaclePercent);
@@ -212,12 +223,16 @@ public class TileMapGenerator : MonoBehaviour {
                 obstacle.localScale = new Vector3((1 - outlinePercent) * tileSize, obstacleHeight, (1 - outlinePercent) * tileSize);
                 obstacle.parent = mapHolder;
 
+                openCollection.Remove(randCoord);
+
             }
             else {
                 obstacleMap[randCoord.x, randCoord.y] = false;
                 currObstCount--;
             }
         }
+
+        m_ShuffledOpenCollection = new Queue<Coords>(Utility.ShuffleArray(openCollection.ToArray(), m_CurrentMap.m_Seed));
 
         //Spawn Tiles
         for (int x = 0; x < m_CurrentMap.mapSize.x; x++)
@@ -232,6 +247,8 @@ public class TileMapGenerator : MonoBehaviour {
                 Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
                 tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
                 tileinstance.parent = mapHolder;
+
+                tileMap[x, y] = tileinstance;
             }
         }
     }

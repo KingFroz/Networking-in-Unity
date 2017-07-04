@@ -9,13 +9,14 @@ public class ActionCamera : MonoBehaviour {
     private Camera actionCamera;
 
     private const float EVASION_HEIGHT = 8.0f;
-    private const float ENGAGE_HEIGHT = 12.0f;
 
     void Start() {
         actionCamera = Camera.main;
     }
 
 	void LateUpdate () {
-        actionCamera.transform.position = new Vector3(follow.transform.position.x, EVASION_HEIGHT, follow.transform.position.z);
-	}
+        if (follow != null) {
+            actionCamera.transform.position = new Vector3(follow.transform.position.x, EVASION_HEIGHT, follow.transform.position.z);
+        }
+    }
 }

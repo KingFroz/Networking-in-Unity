@@ -11,16 +11,13 @@ public class Player : Entity {
 
     WeaponController weaponControl;
 
-    public override void InitMovement() {
-        speed = 50f;
-    }
-
     // Use this for initialization
-    void Start () {
+    protected override void Start () {
+        base.Start();
         rigidBody = GetComponent<Rigidbody>();
-        InitMovement();
         viewCamera = Camera.main;
         weaponControl = GetComponent<WeaponController>();
+        speed = 35f;
     }
 
     void Update()
@@ -46,26 +43,6 @@ public class Player : Entity {
             transform.LookAt(sendPoint);
             weaponControl.Shoot(rigidBody, new Vector3(-transform.forward.x, 0, -transform.forward.z), speed);
         }
-    }
-
-    public override void TakeActionU()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void TakeActionD()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void TakeActionL()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void TakeActionR()
-    {
-        throw new NotImplementedException();
     }
 
     public override void Move()
