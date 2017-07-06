@@ -8,7 +8,7 @@ public class ActionCamera : MonoBehaviour {
 
     private Camera actionCamera;
 
-    private const float EVASION_HEIGHT = 8.0f;
+    private const float EVASION_HEIGHT = 10.0f;
 
     void Start() {
         actionCamera = Camera.main;

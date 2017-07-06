@@ -17,7 +17,7 @@ public class Player : Entity {
         rigidBody = GetComponent<Rigidbody>();
         viewCamera = Camera.main;
         weaponControl = GetComponent<WeaponController>();
-        speed = 35f;
+        speed = 50f;
     }
 
     void Update()

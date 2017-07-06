@@ -88,10 +88,6 @@ public class GameManager : MonoBehaviour {
         float flashSpeed = 4;
 
         Transform randTile = map.GetRandomOpenTile();
-        while (randTile == null)
-        {
-            yield return null;
-        }
 
         Material getMaterial = randTile.GetComponent<Renderer>().material;
         Debug.Log(getMaterial);

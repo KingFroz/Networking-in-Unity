@@ -116,7 +116,11 @@ public class TileMapGenerator : MonoBehaviour {
     public Transform GetRandomOpenTile()
     {
         Coords randCoord = m_ShuffledOpenCollection.Dequeue();
+        if (tileMap[randCoord.x, randCoord.y] == null)
+            return GetRandomOpenTile();
+
         m_ShuffledOpenCollection.Enqueue(randCoord);
+        
         return tileMap[randCoord.x, randCoord.y];
     }
 

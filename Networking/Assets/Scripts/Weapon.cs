@@ -10,6 +10,13 @@ public class Weapon : MonoBehaviour {
 
     private float nextShotTime;
 
+    public AudioClip aClip;
+    private AudioSource aSource;
+
+    void Start()
+    {
+        aSource = GetComponent<AudioSource>();
+    }
     public bool Shoot() {
         if (Time.time > nextShotTime)
         {
@@ -21,9 +28,16 @@ public class Weapon : MonoBehaviour {
                 //tempProjectile.SetSpeed(velocity);
             }
 
+            PlaySound();
             return true;
         } else {
             return false;
         }
+    }
+
+    public void PlaySound() {
+        if (aClip != null)
+            aSource.PlayOneShot(aClip);
+
     }
 }
