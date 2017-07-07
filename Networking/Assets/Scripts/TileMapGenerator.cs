@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.AI;
 using System.Collections.Generic;
 
 public class TileMapGenerator : MonoBehaviour {
@@ -180,6 +179,14 @@ public class TileMapGenerator : MonoBehaviour {
         return new Vector3 (-m_CurrentMap.mapSize.x / 2 + x, 0, -m_CurrentMap.mapSize.y / 2 + y) * tileSize;
     }
 
+    private bool isEdge(int row, int column)
+    {
+        if (row == 0 || column == 0 || row == (m_CurrentMap.mapSize.x - 1) || column == (m_CurrentMap.mapSize.y - 1))
+            return true;
+        
+        return false;
+    }
+
     //Creates Tile Map
     public void GenerateMap()
     {
@@ -228,7 +235,6 @@ public class TileMapGenerator : MonoBehaviour {
                 obstacle.parent = mapHolder;
 
                 openCollection.Remove(randCoord);
-
             }
             else {
                 obstacleMap[randCoord.x, randCoord.y] = false;
@@ -247,12 +253,20 @@ public class TileMapGenerator : MonoBehaviour {
                 //Only Spawn Tile if obstacle doesn't exist in current position
                 if (obstacleMap[x, y] == true)
                     continue;
+                else if (isEdge(x, y)) {
+                    float obstacleHeight = Mathf.Lerp(m_CurrentMap.minObstacleHeight, m_CurrentMap.maxObstacleHeight, (float)prng.NextDouble());
+                    Transform obstacle = Instantiate(obstaclePrefab, tilePosition + Vector3.up * (obstacleHeight * 0.5f), Quaternion.identity) as Transform;
+                    obstacle.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
+                    obstacle.parent = mapHolder;
 
-                Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
-                tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
-                tileinstance.parent = mapHolder;
+                    obstacleMap[x, y] = true;
+                } else {
+                    Transform tileinstance = Instantiate(tilePrefab, tilePosition, Quaternion.Euler(Vector3.right * 90)) as Transform;
+                    tileinstance.localScale = Vector3.one * (1 - outlinePercent) * tileSize;
+                    tileinstance.parent = mapHolder;
 
-                tileMap[x, y] = tileinstance;
+                    tileMap[x, y] = tileinstance;
+                }
             }
         }
     }

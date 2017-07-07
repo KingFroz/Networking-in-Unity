@@ -20,15 +20,15 @@ public abstract class Entity : MonoBehaviour, IMoveable, IDamagable
         isDead = false;
     }
 
-    public void TakeHit(float dmg, RaycastHit hit) {
-        m_Health -= dmg;
+    public virtual void TakeHit(float _damage, Vector3 _hitPoint, Vector3 _hitDirection) {
+        m_Health -= _damage;
 
         if (m_Health <= 0 && !isDead) {
             DeathEvent();
         }
     }
 
-    public void TakeDamage(float dmg)
+    public virtual void TakeDamage(float dmg)
     {
         m_Health -= dmg;
 

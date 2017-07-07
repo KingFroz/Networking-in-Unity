@@ -92,9 +92,10 @@ public class GameManager : MonoBehaviour {
         Material getMaterial = randTile.GetComponent<Renderer>().material;
         Debug.Log(getMaterial);
         Color initialColor = getMaterial.color;
-        Color flashColor = Color.red;
+        Color flashColor = Color.cyan;
 
         float spawnTimer = 0;
+
         while (spawnTimer < spawnDelay)
         {
             getMaterial.color = Color.Lerp(initialColor, flashColor, Mathf.PingPong(spawnTimer * flashSpeed, 1));

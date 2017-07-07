@@ -8,6 +8,8 @@ public class AI : Entity {
     public enum State { Idle, Chasing, Attacking };
     State currentState;
 
+    public ParticleSystem ParticleEffect;
+
     NavMeshAgent pathfinder;
     Transform target;
     bool hasTarget;
@@ -70,6 +72,15 @@ public class AI : Entity {
     void OnTargetDeath() {
         hasTarget = false;
         currentState = State.Idle;
+    }
+
+    public override void TakeHit(float _damage, Vector3 _hitPoint, Vector3 _hitDirection)
+    {
+        if (damage >= m_Health)
+        {
+            Destroy(Instantiate(ParticleEffect.gameObject, _hitPoint, Quaternion.FromToRotation(Vector3.forward, _hitDirection)) as GameObject, ParticleEffect.startLifetime);
+        }
+        base.TakeHit(_damage, _hitPoint, _hitDirection);
     }
 
     IEnumerator Attack()

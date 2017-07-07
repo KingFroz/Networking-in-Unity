@@ -6,7 +6,7 @@ public interface IDestroyable
 }
 
 public interface IDamagable {
-    void TakeHit(float dmg, RaycastHit hit);
+    void TakeHit(float _damage, Vector3 _hitPoint, Vector3 _hitDirection);
     void TakeDamage(float dmg);
 }
 

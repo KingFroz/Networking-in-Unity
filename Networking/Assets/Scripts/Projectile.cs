@@ -13,7 +13,7 @@ public class Projectile : PoolObject {
     void Start() {
         Collider[] initialCollisions = Physics.OverlapSphere(transform.position, .1f, collisionMask);
         if (initialCollisions.Length > 0) {
-            OnHitObject(initialCollisions[0]);
+            OnHitObject(initialCollisions[0], transform.position);
         }
 
         lifeTime += Time.time;
@@ -42,24 +42,15 @@ public class Projectile : PoolObject {
 
         if (Physics.Raycast(ray, out hit, _distane + skinWeight, collisionMask, QueryTriggerInteraction.Collide))
         {
-            OnHitObject(hit);
+            OnHitObject(hit.collider, hit.point);
         }
     }
 
-    void OnHitObject(RaycastHit hit) {
-        IDamagable damageableObject = hit.collider.GetComponent<IDamagable>();
-        if (damageableObject != null) {
-            damageableObject.TakeHit(dmg, hit);
-        }
-
-        Destroy();
-    }
-
-    void OnHitObject(Collider col)
+    void OnHitObject(Collider col, Vector3 hitPoint)
     {
         IDamagable damageableObject = col.GetComponent<IDamagable>();
         if (damageableObject != null) {
-            damageableObject.TakeDamage(dmg);
+            damageableObject.TakeHit(dmg, hitPoint, transform.forward);
         }
 
         Destroy();

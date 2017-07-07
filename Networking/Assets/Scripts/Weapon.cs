@@ -38,6 +38,5 @@ public class Weapon : MonoBehaviour {
     public void PlaySound() {
         if (aClip != null)
             aSource.PlayOneShot(aClip);
-
     }
 }

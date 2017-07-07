@@ -41,7 +41,7 @@ public class Player : Entity {
             Vector3 point = ray.GetPoint(rayDistance);
             Vector3 sendPoint = new Vector3(point.x, transform.position.y, point.z);
             transform.LookAt(sendPoint);
-            weaponControl.Shoot(rigidBody, new Vector3(-transform.forward.x, 0, -transform.forward.z), speed);
+            weaponControl.Shoot(rigidBody, new Vector3(transform.forward.x, 0, transform.forward.z), speed);
         }
     }
 
