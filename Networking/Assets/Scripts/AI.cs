@@ -30,6 +30,7 @@ public class AI : Entity {
     protected override void Start()
     {
         base.Start();
+
         pathfinder = GetComponent<NavMeshAgent>();
         skinMaterial = GetComponentInChildren<Renderer>().material;
         originalColour = skinMaterial.color;
@@ -62,6 +63,7 @@ public class AI : Entity {
                 if (sqrDstToTarget < Mathf.Pow(attackDistanceThreshold + myCollisionRadius + targetCollisionRadius, 2))
                 {
                     nextAttackTime = Time.time + timeBetweenAttacks;
+                    AudioManager.instance.PlaySound("Enemy Attack", transform.position);
                     StartCoroutine(Attack());
                 }
 
@@ -76,10 +78,15 @@ public class AI : Entity {
 
     public override void TakeHit(float _damage, Vector3 _hitPoint, Vector3 _hitDirection)
     {
+
+        //AudioManager.instance.PlaySound("Impact", transform.position);
+
         if (damage >= m_Health)
         {
-            Destroy(Instantiate(ParticleEffect.gameObject, _hitPoint, Quaternion.FromToRotation(Vector3.forward, _hitDirection)) as GameObject, ParticleEffect.startLifetime);
+            AudioManager.instance.PlaySound("Enemy Death", transform.position);
+            Destroy(Instantiate(ParticleEffect.gameObject, _hitPoint, Quaternion.FromToRotation(Vector3.forward, _hitDirection)) as GameObject, 2);
         }
+       
         base.TakeHit(_damage, _hitPoint, _hitDirection);
     }
 

@@ -168,7 +168,7 @@ public class TileMapGenerator : MonoBehaviour {
         }
 
         //Number of Tiles that should exist - Obstacles amount
-        int targetAccessibleTileCount = (int)(m_CurrentMap.mapSize.x * m_CurrentMap.mapSize.y) - currentObstacleCount;
+        int targetAccessibleTileCount = (m_CurrentMap.mapSize.x * m_CurrentMap.mapSize.y) - currentObstacleCount;
 
         //If true, Map is fully accessible
         //Else, inaccessible
@@ -226,7 +226,7 @@ public class TileMapGenerator : MonoBehaviour {
             obstacleMap[randCoord.x, randCoord.y] = true;
             currObstCount++;
 
-            if (randCoord != m_CurrentMap.mapCentre && MapIsFullyAccessible(obstacleMap, currObstCount)) {
+            if (randCoord != m_CurrentMap.mapCentre && !isEdge(randCoord.x, randCoord.y) && MapIsFullyAccessible(obstacleMap, currObstCount)) {
                 float obstacleHeight = Mathf.Lerp(m_CurrentMap.minObstacleHeight, m_CurrentMap.maxObstacleHeight, (float)prng.NextDouble());
                 Vector3 obstaclePosition = CoordToPosition(randCoord.x, randCoord.y);
 

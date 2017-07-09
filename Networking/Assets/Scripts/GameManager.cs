@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour {
 
     TileMapGenerator map;
 
+    public event System.Action<int> OnWaveIncr;
+
     // Use this for initialization
     void Start () {
         foreach (Reserve item in objectsToReserve) {
@@ -78,8 +80,11 @@ public class GameManager : MonoBehaviour {
 
             enemiesRemainingToSpawn = currentWave.numberOfEnemies;
             enemiesStillAlive = enemiesRemainingToSpawn;
+
+            if (OnWaveIncr != null) {
+                OnWaveIncr(currentWaveNumber);
+            }
         }
-       
     }
 
     IEnumerator SpawnEnemy()
@@ -90,9 +95,8 @@ public class GameManager : MonoBehaviour {
         Transform randTile = map.GetRandomOpenTile();
 
         Material getMaterial = randTile.GetComponent<Renderer>().material;
-        Debug.Log(getMaterial);
         Color initialColor = getMaterial.color;
-        Color flashColor = Color.cyan;
+        Color flashColor = Color.red;
 
         float spawnTimer = 0;
 

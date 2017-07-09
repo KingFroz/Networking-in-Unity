@@ -10,33 +10,21 @@ public class Weapon : MonoBehaviour {
 
     private float nextShotTime;
 
-    public AudioClip aClip;
-    private AudioSource aSource;
-
-    void Start()
-    {
-        aSource = GetComponent<AudioSource>();
-    }
     public bool Shoot() {
         if (Time.time > nextShotTime)
         {
             for (int i = 0; i < muzzle.Length; i++)
             {
                 //Convert seconds to MS
-                nextShotTime = Time.time + msBetweenShots / 1000;
+                nextShotTime = Time.time + msBetweenShots * 0.001f;
                 PoolManager.instance.ReuseObject(projectile.gameObject, muzzle[i].position, muzzle[i].rotation, projectile.gameObject.transform.localScale);
                 //tempProjectile.SetSpeed(velocity);
             }
 
-            PlaySound();
+            AudioManager.instance.PlaySound("Default Weapon", transform.position);
             return true;
         } else {
             return false;
         }
-    }
-
-    public void PlaySound() {
-        if (aClip != null)
-            aSource.PlayOneShot(aClip);
     }
 }

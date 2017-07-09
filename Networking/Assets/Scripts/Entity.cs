@@ -37,6 +37,7 @@ public abstract class Entity : MonoBehaviour, IMoveable, IDamagable
         }
     }
 
+    [ContextMenu("Self Destruct")]
     protected void DeathEvent() {
         isDead = true;
         if (OnDeath != null) {
