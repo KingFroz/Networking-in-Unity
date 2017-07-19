@@ -1,89 +1,79 @@
-﻿using System;
+﻿
 using UnityEngine;
 
 public class Player : Entity {
-    private Vector3 destination;
-    private bool flag;
+    private Vector3 joystickInput;
+        
+    //private Camera viewCamera;
 
-    private Rigidbody rigidBody;
-    
-    private Camera viewCamera;
+    public Joystick mJoystick;
+
+    public float movementSpeed;
+    public float rotationSpeed;
+
+    public InteractionButton interact;
 
     WeaponController weaponControl;
 
     // Use this for initialization
     protected override void Start () {
         base.Start();
-        rigidBody = GetComponent<Rigidbody>();
-        viewCamera = Camera.main;
+        //viewCamera = Camera.main;
         weaponControl = GetComponent<WeaponController>();
-        speed = 50f;
     }
 
     void Update()
     {
-        ShootToMove();
+        JoystickMovement();
+
+        if (interact.GetPress())
+            Shoot();
     }
 
-    private void ShootToMove()
+    private void JoystickMovement()
     {
-        if (Input.touchCount > 0)
-            Controller();
-    }
+        joystickInput = mJoystick.GetDirection();
 
-    private void Controller()
-    {
-        Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        float moveX = joystickInput.x;
+        float moveZ = joystickInput.y;
 
-        float rayDistance;
-        if (groundPlane.Raycast(ray, out rayDistance)) {
-            Vector3 point = ray.GetPoint(rayDistance);
-            Vector3 sendPoint = new Vector3(point.x, transform.position.y, point.z);
-            transform.LookAt(sendPoint);
-            weaponControl.Shoot(rigidBody, new Vector3(transform.forward.x, 0, transform.forward.z), speed);
-        }
-    }
-
-    public override void Move()
-    {
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved
-            || (Input.GetMouseButton(0)))
+        if (joystickInput != Vector3.zero)
         {
-            RaycastHit hit = new RaycastHit();
-            Ray ray = new Ray();
+            float angle = Mathf.Atan2(moveZ, moveX);
 
-            //Touch 
-#if UNITY_EDITOR
-            ray = viewCamera.ScreenPointToRay(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
-#elif UNITY_ANDROID
-            ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-#else 
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-#endif
-            //Check if ray hits any collider
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (true)//hit.collider.gameObject.layer == 12)
-                {
-                    flag = true;
-                    destination = new Vector3(hit.point.x, hit.point.y, hit.point.z);
-                }
-            }
+            moveX *= Mathf.Abs(Mathf.Cos(angle));
+            moveZ *= Mathf.Abs(Mathf.Sin(angle));
 
-            //check if the flag for movement is true and the current gameobject position is not same as the clicked / tapped position
-            if (flag && !Mathf.Approximately(gameObject.transform.position.magnitude, destination.magnitude))
-            {
-                //move the gameobject to the desired position
-                gameObject.transform.position = Vector3.Lerp(gameObject.transform.position, destination, Time.deltaTime * speed);
-            }
-            //set the movement indicator flag to false if the endPoint and current gameobject position are equal
-            else if (flag && Mathf.Approximately(gameObject.transform.position.magnitude, destination.magnitude))
-            {
-                flag = false;
-            }
+            joystickInput = new Vector3(moveX, 0, moveZ);
+            joystickInput = transform.TransformDirection(joystickInput);
 
-            transform.LookAt(destination + Vector3.up * transform.position.y);
+            Vector3 tempPosition = transform.position;
+            tempPosition.x += moveX;
+            tempPosition.z += moveZ;
+
+            Vector3 lookDirection = tempPosition - transform.position;
+            if (lookDirection != Vector3.zero)
+                transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.LookRotation(lookDirection), rotationSpeed * Time.deltaTime);
+
+            transform.Translate(Vector3.forward * movementSpeed * Time.deltaTime);
         }
     }
+
+    private void Shoot() {
+        weaponControl.Shoot();
+    }
+
+    //private void Controller()
+    //{
+    //    Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
+    //    Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+
+    //    float rayDistance;
+    //    if (groundPlane.Raycast(ray, out rayDistance)) {
+    //        Vector3 point = ray.GetPoint(rayDistance);
+    //        Vector3 sendPoint = new Vector3(point.x, transform.position.y, point.z);
+    //        transform.LookAt(sendPoint);
+    //        //weaponControl.Shoot(rigidBody, new Vector3(transform.forward.x, 0, transform.forward.z), speed);
+    //    }
+    //}
 }

@@ -142,9 +142,4 @@ public class AI : Entity {
             yield return new WaitForSeconds(refreshRate);
         }
     }
-
-    public override void Move()
-    {
-        throw new NotImplementedException();
-    }
 }

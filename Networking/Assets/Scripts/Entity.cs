@@ -2,12 +2,8 @@
 using System;
 using UnityEngine;
 
-public abstract class Entity : MonoBehaviour, IMoveable, IDamagable
+public abstract class Entity : MonoBehaviour, IDamagable
 {
-    //Movement
-    public float speed { get; set;}
-    public abstract void Move();
-
     public float baseHealth;
     protected float m_Health;
     protected bool isDead;

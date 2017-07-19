@@ -23,14 +23,19 @@ public class WeaponController : MonoBehaviour {
         equippedWeapon.transform.parent = holster;
     }
 
-    public void Shoot(Rigidbody _rigidbody, Vector3 _direction,float _force)
-    {
-        if (equippedWeapon != null) {
-            bool applyForce;
-            applyForce = equippedWeapon.Shoot();
-
-            if (applyForce)
-                _rigidbody.AddForce(_direction * _force);
-        }
+    public void Shoot() {
+        if (equippedWeapon != null)
+            equippedWeapon.Shoot();
     }
+
+    //public void Shoot(Rigidbody _rigidbody, Vector3 _direction,float _force)
+    //{
+    //    if (equippedWeapon != null) {
+    //        bool applyForce;
+    //        applyForce = equippedWeapon.Shoot();
+
+    //        if (applyForce)
+    //            _rigidbody.AddForce(_direction * _force);
+    //    }
+    //}
 }
